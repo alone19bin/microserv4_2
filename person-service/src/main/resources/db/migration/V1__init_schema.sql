@@ -1,0 +1,5 @@
+
+CREATE SCHEMA IF NOT EXISTS person;
+
+-- uuid
+CREATE EXTENSION IF NOT EXISTS "uuid-ossp";
