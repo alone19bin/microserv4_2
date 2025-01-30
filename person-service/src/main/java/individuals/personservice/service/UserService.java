@@ -1,47 +1,45 @@
-package individuals.api.service;
+package individuals.personservice.service;
 
 
-import individuals.api.entity.UserEntity;
-import individuals.api.repository.UserRepository;
 import individuals.common.dto.UserDto;
+import individuals.personservice.model.User;
+import individuals.personservice.repository.UserRepository;
+import individuals.personservice.exception.UserNotFoundException;
+import individuals.personservice.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
-import java.time.LocalDateTime;
-import java.util.UUID;  // Добавлен импорт UUID
+import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
 public class UserService {
     private final UserRepository userRepository;
+    private final UserMapper userMapper;;
 
-    @Transactional
-    public UserEntity createUser(UserEntity user) {
-        return userRepository.save(user);
+    @Transactional(readOnly = true)
+    public UserDto getUserByEmail(String email) {
+        User user = userRepository.findByEmail(email)
+                .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found"));
+        return userMapper.toDto(user);
     }
 
     @Transactional
-    public UserEntity createUser(UserDto userDto) {
-        UserEntity user = new UserEntity();
-        user.setEmail(userDto.getEmail());
-        user.setFirstName(userDto.getFirstName());
-        user.setLastName(userDto.getLastName());
-        user.setFilled(false);
+    public User createUser(UserDto userDto) {
+        //Преобразуем DTO в сущность
+        User user = userMapper.toEntity(userDto);
 
+        //Сохраняем и возвращаем сущность
         return userRepository.save(user);
+    }
+    public UserDto createUserAndReturnDto(UserDto userDto) {
+        User createdUser = createUser(userDto);
+        return userMapper.toDto(createdUser);
     }
 
     @Transactional
-    public UserEntity updateUser(UUID userId, UserDto userDto) {
-        UserEntity existingUser = userRepository.findById(userId)
-            .orElseThrow(() -> new RuntimeException("Пользователь не найден"));
-
-        existingUser.setFirstName(userDto.getFirstName());
-        existingUser.setLastName(userDto.getLastName());
-        existingUser.setUpdated(LocalDateTime.now());
-        existingUser.setFilled(true);
-
-        return userRepository.save(existingUser);
+    public void deleteUser(UUID userId) {
+        userRepository.deleteById(userId);
     }
 }

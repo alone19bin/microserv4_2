@@ -1,10 +1,54 @@
 plugins {
     id 'java-library'
+    id 'maven-publish'
+    id 'org.springframework.boot' version '3.1.0' apply false
+    id 'io.spring.dependency-management' version '1.1.0' apply false
+}
+
+apply plugin: 'org.springframework.boot'
+apply plugin: 'io.spring.dependency-management'
+
+group 'individuals.common'
+version '1.0.0'
+
+repositories {
+    mavenCentral()
 }
 
 dependencies {
-    compileOnly 'org.projectlombok:lombok'
-    annotationProcessor 'org.projectlombok:lombok'
+    // Lombok
+    compileOnly 'org.projectlombok:lombok:1.18.30'
+    annotationProcessor 'org.projectlombok:lombok:1.18.30'
 
+    // Jackson
     implementation 'com.fasterxml.jackson.core:jackson-annotations:2.15.2'
+
+    // Validation
+    implementation 'jakarta.validation:jakarta.validation-api:3.0.2'
+    implementation 'org.hibernate.validator:hibernate-validator:8.0.1.Final'
+    implementation 'org.springframework.boot:spring-boot-starter-validation'
+
+    // Spring Boot
+    implementation 'org.springframework.boot:spring-boot-starter'
+
+    // Testing
+    testImplementation 'org.junit.jupiter:junit-jupiter-api:5.9.2'
+    testRuntimeOnly 'org.junit.jupiter:junit-jupiter-engine:5.9.2'
+}
+
+java {
+    sourceCompatibility = JavaVersion.VERSION_21
+    targetCompatibility = JavaVersion.VERSION_21
+}
+
+publishing {
+    publications {
+        mavenJava(MavenPublication) {
+            from components.java
+        }
+    }
+}
+
+test {
+    useJUnitPlatform()
 }

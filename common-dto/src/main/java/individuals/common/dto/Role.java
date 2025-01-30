@@ -1,4 +1,6 @@
 package individuals.common.dto;
-
-public class Role {
+public enum Role {
+    USER,
+    ADMIN,
+    MODERATOR
 }

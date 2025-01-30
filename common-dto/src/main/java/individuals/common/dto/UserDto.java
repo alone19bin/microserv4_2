@@ -1,25 +1,32 @@
-package individuals.common.dto;
+    package individuals.common.dto;
 
-import com.fasterxml.jackson.annotation.JsonProperty;
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.Data;
-import java.io.Serializable;
+    import jakarta.validation.constraints.Email;
+    import jakarta.validation.constraints.NotBlank;
+    import lombok.AllArgsConstructor;
+    import lombok.Builder;
+    import lombok.Data;
+    import lombok.NoArgsConstructor;
 
-@Data
-public class UserDto implements Serializable {
-    @JsonProperty("id")
-    private String id;
+    import java.util.UUID;
 
-    @NotBlank(message = "First name is required")
-    @JsonProperty("firstName")
-    private String firstName;
+    @Data
+    @Builder
+    @NoArgsConstructor
+    @AllArgsConstructor
+    public class UserDto {
+        private UUID id;
 
-    @NotBlank(message = "Last name is  required")
-    @JsonProperty("lastName")
-    private String lastName;
+        @NotBlank(message = "Имя  обязательно")
+        private String firstName;
 
-    @Email(message = "Invali d email format")
-    @JsonProperty("email")
-    private String email;
-}
+        @NotBlank(message = "Фамилия обязательна")
+        private String lastName;
+
+        @Email(message = " Некорректный email")
+        @NotBlank(message = " Email обязателен")
+        private String email;
+
+        @NotBlank(message = "Пароль обязателен")
+        private String password;
+
+    }

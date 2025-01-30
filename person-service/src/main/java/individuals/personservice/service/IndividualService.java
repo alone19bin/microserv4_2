@@ -1,35 +1,40 @@
 package individuals.personservice.service;
+
+
+
+
+
+
 import individuals.common.dto.IndividualDto;
 import individuals.personservice.model.Individual;
 import individuals.personservice.model.User;
 import individuals.personservice.repository.IndividualRepository;
-import individuals.personservice.repository.UserRepository;
+import jakarta.persistence.EntityNotFoundException;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.UUID;
 
 @Service
+@Transactional
 @RequiredArgsConstructor
 public class IndividualService {
+
     private final IndividualRepository individualRepository;
-    private final UserRepository userRepository;
 
-    public Individual createIndividual(IndividualDto individualDto) {
-        User user = createUserFromDto(individualDto);
-        userRepository.save(user);
-
-        Individual individual = new Individual();
-        individual.setUser(user);
-        individual.setPassportNumber(individualDto.getPassportNumber());
-        individual.setPhoneNumber(individualDto.getPhoneNumber());
-
+    public Individual createIndividual(IndividualDto individualDto, User user) {
+        Individual individual = Individual.builder()
+                .user(user)
+                .passportNumber(individualDto.getPassportNumber())
+                .phoneNumber(individualDto.getPhoneNumber())
+                .build();
         return individualRepository.save(individual);
     }
 
-    private User createUserFromDto(IndividualDto dto) {
-        User user = new User();
-        user.setFirstName(dto.getFirstName());
-        user.setLastName(dto.getLastName());
-        user.setEmail(dto.getEmail());
-        return user;
+    public void deleteIndividual(UUID individualId) {
+        Individual individual = individualRepository.findById(individualId)
+                .orElseThrow(() -> new EntityNotFoundException("Individual not found"));
+        individualRepository.delete(individual);
     }
 }

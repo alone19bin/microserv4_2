@@ -1,4 +1,5 @@
 package individuals.personservice.mapper;
 
-public class Role {
+public enum Role {
+    USER, ADMIN, MODERATOR
 }
