@@ -1,32 +1,28 @@
     package individuals.common.dto;
 
-    import jakarta.validation.constraints.Email;
-    import jakarta.validation.constraints.NotBlank;
-    import lombok.AllArgsConstructor;
-    import lombok.Builder;
-    import lombok.Data;
-    import lombok.NoArgsConstructor;
+import lombok.AllArgsConstructor;
+import lombok.Builder;
+import lombok.Data;
+import lombok.NoArgsConstructor;
+import java.time.LocalDateTime;
+import java.util.UUID;
 
-    import java.util.UUID;
-
-    @Data
-    @Builder
-    @NoArgsConstructor
-    @AllArgsConstructor
-    public class UserDto {
-        private UUID id;
-
-        @NotBlank(message = "Имя  обязательно")
-        private String firstName;
-
-        @NotBlank(message = "Фамилия обязательна")
-        private String lastName;
-
-        @Email(message = " Некорректный email")
-        @NotBlank(message = " Email обязателен")
-        private String email;
-
-        @NotBlank(message = "Пароль обязателен")
-        private String password;
-
+@Data
+@Builder
+@NoArgsConstructor
+@AllArgsConstructor
+public class UserDto {
+    public enum Role {
+        USER, ADMIN, MODERATOR
     }
+
+    private UUID id;
+    private Role role;
+    private String firstName;
+    private String lastName;
+    private String email;
+    private AddressDto address;
+    private LocalDateTime created;
+    private LocalDateTime updated;
+    private Boolean filled;
+}

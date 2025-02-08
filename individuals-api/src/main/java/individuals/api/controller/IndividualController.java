@@ -1,31 +1,29 @@
 package individuals.api.controller;
 
 import individuals.common.dto.IndividualDto;
-
 import individuals.personservice.service.IndividualService;
-import jakarta.validation.Valid;
-import lombok.Data;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import java.util.UUID;
 
-@Data
-@RequestMapping("/api/individuals")
+@RestController
+@RequestMapping("/api/users")
 public class IndividualController {
-    private final IndividualService individualService;
+
+    @Autowired
+    private IndividualService individualService;
 
     @PostMapping
-    public ResponseEntity<IndividualDto> createIndividual(
-            @RequestParam UUID userId,
-            @Valid @RequestBody IndividualDto individualDto
-    ) {
-        return ResponseEntity.ok(individualService.createIndividual(userId, individualDto));
+    public ResponseEntity<IndividualDto> createUser(@RequestBody IndividualDto individualDto) {
+        IndividualDto createdIndividual = individualService.createIndividual(individualDto);
+        return ResponseEntity.ok(createdIndividual);
     }
 
-    @DeleteMapping("/user/{userId}")
-    public ResponseEntity<Void> deleteIndividualByUserId(@PathVariable UUID userId) {
-        individualService.deleteByUserId(userId);
-        return ResponseEntity.ok().build();
+    @DeleteMapping("/{userId}")
+    public ResponseEntity<Void> deleteUser(@PathVariable UUID userId) {
+        individualService.deleteIndividual(userId);
+        return ResponseEntity.noContent().build();
     }
 }

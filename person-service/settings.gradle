@@ -1,1 +1,5 @@
-rootProject.name = 'person-service'
+rootProject.name = 'microservices'
+include 'common-dto'
+include 'individuals-api'
+include 'person-service'
+

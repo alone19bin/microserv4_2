@@ -1,47 +1,60 @@
 package individuals.common.dto;
 
-import jakarta.validation.constraints.Email;
-import jakarta.validation.constraints.NotBlank;
-import lombok.AllArgsConstructor;
+import jakarta.validation.Valid;
+import jakarta.validation.constraints.NotNull;
+import lombok.Builder;
 import lombok.Data;
-import lombok.NoArgsConstructor;
+
+import java.time.LocalDateTime;
+import java.util.UUID;
 
 @Data
-@NoArgsConstructor
-@AllArgsConstructor
+@Builder
 public class UserRegistrationRequest {
-    @NotBlank(message = "Имя обязательно")
-    private String firstName;
+    @Valid
+    @NotNull(message = "Данные пользователя обязательны")
+    private UserDto user;
 
-    @NotBlank(message = "Фамилия    обязательна")
-    private String lastName;
+    @Valid
+    @NotNull(message = "Данные индивидуала обязательны")
+    private IndividualDto individual;
 
-    @Email(message = "Некорректный email")
-    @NotBlank(message = " Email обязателен")
-    private String email;
+    @Valid
+    private AddressDto address;
 
-    @NotBlank(message = "Пароль обязателен")
-    private String password;
+                 //создания запроса сполной валидацией и связыванием
+    public static UserRegistrationRequest create(
+            String email, 
+            String firstName, 
+            String lastName, 
+            String passportNumber, 
+            String phoneNumber
+    ) {
+        LocalDateTime now = LocalDateTime.now();
+        UUID id = UUID.randomUUID();
 
-    @NotBlank(message = "Номер паспорта обязателен")
-    private String passportNumber;
+        UserDto user = UserDto.builder()
+            .id(id)
+            .email(email)
+            .firstName(firstName)
+            .lastName(lastName)
+            .created(now)
+            .updated(now)
+            .filled(false)
+            .build();
 
-    @NotBlank(message = "Номер  телефона обязателен")
-    private String phoneNumber;
+        IndividualDto individual = IndividualDto.builder()
+            .user(user)
+            .passportNumber(passportNumber)
+            .phoneNumber(phoneNumber)
+            .verifiedAt(now)
+            .archivedAt(now)
+            .status("ACTIVE")
+            .build();
 
-    public UserDto toUserDTO() {
-        return UserDto.builder()
-                .firstName(firstName)
-                .lastName(lastName)
-                .email(email)
-                .password(password)
-                .build();
-    }
-
-    public IndividualDto toIndividualDTO() {
-        return IndividualDto.builder()
-                .passportNumber(passportNumber)
-                .phoneNumber(phoneNumber)
-                .build();
+        return UserRegistrationRequest.builder()
+            .user(user)
+            .individual(individual)
+            .build();
     }
 }

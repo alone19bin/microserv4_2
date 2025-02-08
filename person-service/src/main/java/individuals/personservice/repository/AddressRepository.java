@@ -1,6 +1,6 @@
 package individuals.personservice.repository;
 
-import individuals.personservice.model.Address;
+import individuals.personservice.entity.Address;
 import org.springframework.data.jpa.repository.JpaRepository;
 import org.springframework.stereotype.Repository;
 import java.util.UUID;

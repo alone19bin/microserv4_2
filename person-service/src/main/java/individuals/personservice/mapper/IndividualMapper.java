@@ -1,45 +1,46 @@
 package individuals.personservice.mapper;
 
-
-
 import individuals.common.dto.IndividualDto;
-import individuals.personservice.model.Individual;
-import individuals.personservice.model.User;
-import org.mapstruct.Mapper;
-import org.mapstruct.Mapping;
-import org.mapstruct.ReportingPolicy;
+import individuals.personservice.entity.Individual;
+import individuals.personservice.entity.User;
+import org.mapstruct.*;
 
 @Mapper(
         componentModel = "spring",
-        unmappedTargetPolicy = ReportingPolicy.IGNORE
+        uses = {UserMapper.class},
+        unmappedTargetPolicy = ReportingPolicy.IGNORE,
+        nullValuePropertyMappingStrategy = NullValuePropertyMappingStrategy.IGNORE
 )
 public interface IndividualMapper {
-
-    @Mapping(target = "userId", expression = "java(individual.getUser() != null ? individual.getUser().getId() : null)")
-    @Mapping(target = "email", expression = "java(individual.getUser() != null ? individual.getUser().getEmail() : null)")
-    @Mapping(target = "firstName", expression = "java(individual.getUser() != null ? individual.getUser().getFirstName() : null)")
-    @Mapping(target = "lastName", expression = "java(individual.getUser() != null ? individual.getUser().getLastName() : null)")
-    @Mapping(target = "passportNumber", source = "passportNumber")
-    @Mapping(target = "phoneNumber", source = "phoneNumber")
     IndividualDto toDto(Individual individual);
+    Individual toEntity(IndividualDto individualDto);
 
-    default Individual toEntity(IndividualDto individualDto) {
-        if (individualDto == null) return null;
+                //обновление существующей сущности
+    default Individual updateEntityFromDto(IndividualDto dto, @MappingTarget Individual entity) {
+        if (dto == null) {
+            return entity;
+        }
 
-        Individual individual = new Individual();
-        individual.setId(individualDto.getUserId());
+        // Обновление  поля
+        entity.setPassportNumber(dto.getPassportNumber());
+        entity.setPhoneNumber(dto.getPhoneNumber());
+        entity.setEmail(dto.getEmail());
+        entity.setVerifiedAt(dto.getVerifiedAt());
+        entity.setArchivedAt(dto.getArchivedAt());
+        entity.setStatus(dto.getStatus());
 
-        // Создаем объект User
-        User user = new User();
-        user.setId(individualDto.getUserId());
-        user.setEmail(individualDto.getEmail());
-        user.setFirstName(individualDto.getFirstName());
-        user.setLastName(individualDto.getLastName());
+           //Если  надо обновить связанного пользователя
+        if (dto.getUser() != null) {
+            User user = entity.getUser();
+            if (user == null) {
+                user = new User();
+                entity.setUser(user);
+            }
+            user.setEmail(dto.getUser().getEmail());
+            user.setFirstName(dto.getUser().getFirstName());
+            user.setLastName(dto.getUser().getLastName());
+        }
 
-        individual.setUser(user);
-        individual.setPassportNumber(individualDto.getPassportNumber());
-        individual.setPhoneNumber(individualDto.getPhoneNumber());
-
-        return individual;
+        return entity;
     }
 }

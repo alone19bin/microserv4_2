@@ -13,7 +13,6 @@ import java.util.UUID;
 @AllArgsConstructor
 public class UserRegistrationSagaResult {
     private SagaStatus status;
-    private UUID userId;
-    private UUID individualId;
+    private UserRegistrationResponse response;
     private String errorMessage;
 }

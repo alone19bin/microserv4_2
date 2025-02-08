@@ -20,7 +20,7 @@ public class PersonDto implements Serializable {
     @JsonProperty("firstName")
     private String firstName;
 
-    @NotBlank(message = "Last  name is required")
+    @NotBlank(message = "Last  na  me is required")
     @Size(max = 32, message = "l ast name must be less than 32 character s")
     @JsonProperty("lastName")
     private String lastName;

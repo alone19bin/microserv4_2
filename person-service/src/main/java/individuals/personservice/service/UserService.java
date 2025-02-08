@@ -1,10 +1,15 @@
 package individuals.personservice.service;
 
 
+import individuals.common.dto.IndividualDto;
 import individuals.common.dto.UserDto;
-import individuals.personservice.model.User;
-import individuals.personservice.repository.UserRepository;
+import individuals.personservice.client.PersonServiceClient;
+import individuals.personservice.entity.Individual;
 import individuals.personservice.exception.UserNotFoundException;
+import individuals.personservice.repository.AddressRepository;
+import individuals.personservice.repository.IndividualRepository;
+import individuals.personservice.repository.UserRepository;
+import individuals.personservice.entity.User;
 import individuals.personservice.mapper.UserMapper;
 import lombok.RequiredArgsConstructor;
 import org.springframework.stereotype.Service;
@@ -14,32 +19,41 @@ import java.util.UUID;
 
 @Service
 @RequiredArgsConstructor
+@Transactional
 public class UserService {
     private final UserRepository userRepository;
-    private final UserMapper userMapper;;
+    private final IndividualRepository individualRepository;
+    private final AddressRepository addressRepository;
+    private final UserMapper userMapper;
 
-    @Transactional(readOnly = true)
-    public UserDto getUserByEmail(String email) {
+    public void deleteUser(UUID userId) {
+        Individual individual = individualRepository.findByUserId(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        individualRepository.delete(individual);
+
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
+
+        if (user.getAddress() != null) {
+            addressRepository.delete(user.getAddress());
+        }
+
+        userRepository.delete(user);
+    }
+
+    public UserDto findUserByEmail(String email) {
         User user = userRepository.findByEmail(email)
-                .orElseThrow(() -> new UserNotFoundException("User with email " + email + " not found"));
+                .orElseThrow(() -> new UserNotFoundException("User not found"));
         return userMapper.toDto(user);
     }
 
-    @Transactional
-    public User createUser(UserDto userDto) {
-        //Преобразуем DTO в сущность
-        User user = userMapper.toEntity(userDto);
-
-        //Сохраняем и возвращаем сущность
-        return userRepository.save(user);
-    }
-    public UserDto createUserAndReturnDto(UserDto userDto) {
-        User createdUser = createUser(userDto);
-        return userMapper.toDto(createdUser);
+    public UserDto createUser(IndividualDto individualDto) {
+                    // создания пользователя из Individual dto
+        User user = userMapper.toEntity(individualDto.getUser());
+        user = userRepository.save(user);
+        return userMapper.toDto(user);
     }
 
-    @Transactional
-    public void deleteUser(UUID userId) {
-        userRepository.deleteById(userId);
-    }
+
 }

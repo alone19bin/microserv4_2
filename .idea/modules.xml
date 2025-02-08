@@ -3,6 +3,8 @@
   <component name="ProjectModuleManager">
     <modules>
       <module fileurl="file://$PROJECT_DIR$/.idea/modules/common-dto/microservices.common-dto.main.iml" filepath="$PROJECT_DIR$/.idea/modules/common-dto/microservices.common-dto.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/individuals-api/microservices.individuals-api.main.iml" filepath="$PROJECT_DIR$/.idea/modules/individuals-api/microservices.individuals-api.main.iml" />
+      <module fileurl="file://$PROJECT_DIR$/.idea/modules/person-service/microservices.person-service.main.iml" filepath="$PROJECT_DIR$/.idea/modules/person-service/microservices.person-service.main.iml" />
     </modules>
   </component>
 </project>

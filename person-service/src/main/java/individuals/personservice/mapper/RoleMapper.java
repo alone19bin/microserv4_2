@@ -1,5 +1,6 @@
 package individuals.personservice.mapper;
 
+import individuals.common.dto.Role;
 import org.mapstruct.Mapper;
 
 @Mapper(componentModel = "spring")
