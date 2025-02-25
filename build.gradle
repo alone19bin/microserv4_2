@@ -1,0 +1,13 @@
+plugins {
+    id 'java'
+}
+
+allprojects {
+    repositories {
+        mavenCentral()
+    }
+}
+
+subprojects {
+    version = '1.0-SNAPSHOT'
+} 

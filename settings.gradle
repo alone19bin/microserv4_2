@@ -1,0 +1,5 @@
+rootProject.name = 'individual-registration'
+
+include 'common-dto'
+include 'person-service'
+include 'individuals-api' 

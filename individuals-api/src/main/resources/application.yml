@@ -1,0 +1,19 @@
+server:
+  port: 8080
+
+person-service:
+  url: http://localhost:8081
+
+keycloak:
+  auth-server-url: http://localhost:8082
+  realm: individual-registration
+  resource: admin-cli
+  credentials:
+    secret: ShsRPMs03tuyA5ePE42YZLNSMSkKMtNP
+  admin:
+    username: admin
+    password: admin
+  public-client: false
+  bearer-only: false
+  use-resource-role-mappings: true
+  ssl-required: external
