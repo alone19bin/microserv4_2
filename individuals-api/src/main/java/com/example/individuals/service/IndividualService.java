@@ -63,6 +63,38 @@ public class IndividualService {
                //удалить из person-service
         personServiceClient.deletePerson(userId);
     }
+    public void deleteIndividualById(UUID id) {
+        if (id == null) {
+            throw new IllegalArgumentException("ID пользователя не указан");
+        }
+
+                        //Получение пользователя по id  через email, также можно  удалить из keycloak
+        String email = null;
+        try {
+            IndividualDto individual = personServiceClient.getPersonByEmail(null); // Предполагается, что это временный вызов, нужен реальный способ получения email
+            if (individual != null && individual.getUser() != null) {
+                email = individual.getUser().getEmail();
+            }
+        } catch (Exception e) {
+            log.warn("Не удалось получить email для пользователя с ID {}: {}", id, e.getMessage());
+        }
+         //удаление из Keycloak, если email нам известен
+        if (email != null && !email.isEmpty()) {
+            try {
+                keycloakService.deleteUser(email);
+            } catch (Exception e) {
+                log.warn("Ошибка при удалении пользователя из Keycloak по ID {}: {}", id, e.getMessage());
+
+            }
+        } else {
+            log.warn("Email пользователя с ID {} неизвестен, удаление из Keycloak пропущено", id);
+        }
+
+        // удаление из person-service
+        personServiceClient.deletePerson(id);
+    }
+
+
 
     public IndividualDto updateIndividual(IndividualDto individualDto) {
         UserDto updatedUser = personServiceClient.updatePerson(individualDto.getUser());

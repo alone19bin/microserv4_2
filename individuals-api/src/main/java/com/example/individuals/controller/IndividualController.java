@@ -8,6 +8,8 @@ import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.util.UUID;
+
 @RestController
 @RequestMapping("/api/v1/individuals")
 @RequiredArgsConstructor
@@ -34,10 +36,10 @@ public class IndividualController {
             individualService.deleteIndividual(individualDto);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            log.error(" Ошибка при удалении пользователя: {}", e.getMessage(), e);
+            log.error("Ошиб ка при удалении пользователя: {}", e.getMessage(), e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Ошибка при удалении пользователя : " + e.getMessage());
+                    .body("Ошибка при удалении пользователя: " + e.getMessage());
         }
     }
 
@@ -67,6 +69,8 @@ public class IndividualController {
         }
     }
 
+
+
     @DeleteMapping("/{email}")
     public ResponseEntity<?> deleteIndividualByEmail(@PathVariable String email) {
         try {
@@ -84,4 +88,18 @@ public class IndividualController {
                     .body("Ошибка при удалении пользователя: " + e.getMessage());
         }
     }
+
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteIndividualById(@PathVariable UUID id) {
+        try {
+            individualService.deleteIndividualById(id);
+            return ResponseEntity.ok().build();
+        } catch (Exception e) {
+            log.error("Ошибка при удалении пользователя по ID {}: {}", id, e.getMessage(), e);
+            return ResponseEntity
+                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body("Ошибка при удалении пользователя: " + e.getMessage());
+        }
+    }
+
 } 

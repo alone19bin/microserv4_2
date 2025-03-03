@@ -16,6 +16,7 @@ repositories {
 
 ext {
     postgresVersion = '15.0'
+    testcontainersVersion = '1.19.3'
 }
 
 dependencies {
@@ -30,7 +31,9 @@ dependencies {
     annotationProcessor 'org.projectlombok:lombok'
     
     testImplementation 'org.springframework.boot:spring-boot-starter-test'
-    testImplementation "org.testcontainers:postgresql:1.19.3"
+    testImplementation "org.testcontainers:junit-jupiter:${testcontainersVersion}"
+    testImplementation "org.testcontainers:postgresql:${testcontainersVersion}"
+    testImplementation 'org.testcontainers:testcontainers:1.19.3'
 }
 
 flyway {

@@ -80,7 +80,31 @@ public class PersonService {
 
     @Transactional
     public void deletePerson(UUID userId) {
+        // Сначала получаем email пользователя, которого удаляем
+        User user = userRepository.findById(userId)
+                .orElseThrow(() -> new RuntimeException("User not found with ID: " + userId));
+        String email = user.getEmail();
+        
+        // Сначала удаляем запись из таблицы individuals для этого пользователя
+        individualRepository.findByUserId(userId).ifPresent(individual -> 
+            individualRepository.delete(individual)
+        );
+        
+        // Удаляем указанного пользователя
         userRepository.deleteById(userId);
+        
+        // Находим и удаляем всех других пользователей с тем же email и их записи в individuals
+        List<User> usersWithSameEmail = userRepository.findAllByEmail(email);
+        for (User userWithSameEmail : usersWithSameEmail) {
+            if (!userWithSameEmail.getId().equals(userId)) {
+                // Сначала удаляем запись из individuals
+                individualRepository.findByUserId(userWithSameEmail.getId()).ifPresent(individual -> 
+                    individualRepository.delete(individual)
+                );
+                // Затем удаляем самого пользователя
+                userRepository.deleteById(userWithSameEmail.getId());
+            }
+        }
     }
 
     @Transactional
@@ -139,8 +163,7 @@ public class PersonService {
                     newIndividual.setStatus("ACTIVE");
                     return newIndividual;
                 });
-        
-        // Обновление
+
         individual.setEmail(savedUser.getEmail());
         individual.setVerifiedAt(now);
 
@@ -198,5 +221,12 @@ public class PersonService {
         }
         
         return individualMapper.toDto(individualOpt.get());
+    }
+
+    @Transactional
+    public void deleteIndividual(UUID userId) {
+        Individual individual = individualRepository.findByUserId(userId)
+                .orElseThrow(() -> new RuntimeException("Individual not found for user with ID: " + userId));
+        individualRepository.delete(individual);
     }
 } 

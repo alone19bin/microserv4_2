@@ -33,6 +33,16 @@ public class PersonController {
 
     @GetMapping("/email/{email}")
     public ResponseEntity<IndividualDto> getPersonByEmail(@PathVariable String email) {
-        return ResponseEntity.ok(personService.getPersonByEmail(email));
+        try {
+            return ResponseEntity.ok(personService.getPersonByEmail(email));
+        } catch (RuntimeException e) {
+            return ResponseEntity.notFound().build();
+        }
+    }
+
+    @DeleteMapping("/individual/{userId}")
+    public ResponseEntity<Void> deleteIndividual(@PathVariable UUID userId) {
+        personService.deleteIndividual(userId);
+        return ResponseEntity.ok().build();
     }
 } 
