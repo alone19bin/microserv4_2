@@ -2,6 +2,7 @@ package com.example.individuals.client;
 
 import com.example.dto.IndividualDto;
 import com.example.dto.UserDto;
+import com.example.individuals.model.IndividualStatus;
 import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 import org.junit.jupiter.api.extension.ExtendWith;
@@ -67,7 +68,7 @@ public class KeycloakClientTest {
         individualDto.setEmail(userEmail);
         individualDto.setPassportNumber("1234 567890");
         individualDto.setPhoneNumber("+7 (999) 123-45-67");
-        individualDto.setStatus("ACTIVE");
+        individualDto.setStatus(String.valueOf(IndividualStatus.ACTIVE));
 
         // Настройка  моков
         when(keycloak.realm(realmName)).thenReturn(realmResource);

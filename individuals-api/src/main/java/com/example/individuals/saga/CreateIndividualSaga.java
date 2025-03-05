@@ -16,17 +16,18 @@ public class CreateIndividualSaga {
     private final KeycloakService keycloakService;
     
         // для тестирования - если true, то ошибки keycloak будут игнорироваться
-    private boolean ignoreKeycloakErrors = true;
+    private boolean ignoreKeycloakErrors = false;
 
     public IndividualDto execute(IndividualDto individualDto) {
         UserDto createdUser = null;
+        
         try {
-               //существует ли пользователь с таким email
+            //существует ли пользователь с таким email
             try {
                 IndividualDto existingIndividual = personServiceClient.getPersonByEmail(individualDto.getUser().getEmail());
                 if (existingIndividual != null) {
                     log.info("Пользователь с email {} уже существует, обновляем данные", individualDto.getUser().getEmail());
-                       //Если пользователь существует, обновляем его данные
+                    //Если пользователь существует, обновляем его данные
                     individualDto.getUser().setId(existingIndividual.getUser().getId());
                     return updateExistingIndividual(individualDto);
                 }
@@ -35,33 +36,40 @@ public class CreateIndividualSaga {
                 log.info("Пользователь с email {} не найден, создаем нового", individualDto.getUser().getEmail());
             }
 
-                 // 1: Создание пользователя в personservice
+            // 1: Создание пользователя в personservice
             createdUser = personServiceClient.createPerson(individualDto.getUser());
             individualDto.setUser(createdUser);
 
-                 // 2: Создание пользователя в keycloak
+            // 2: Создание пользователя в keycloak
             try {
                 keycloakService.createUser(individualDto);
             } catch (Exception e) {
-                log.warn("Ошибка при создании пользователя в Keycloak: {}", e.getMessage());
-                // Если  ignoreKeycloakErrors = false, пробрасываем исключение дальше
+                log.error("Ошибка при создании пользователя в Keycloak: {}", e.getMessage());
                 if (!ignoreKeycloakErrors) {
-                    throw e;
+                    throw e; // Пробрасываем ошибку дальше только если не игнорируем ошибки Keycloak
+                } else {
+                    log.info("Игнорируем ошибку Keycloak, продолжаем выполнение");
+                    return individualDto;
                 }
-                //иначе - продолжаем выполнение, так как пользователь уже создан в person service
             }
 
             return individualDto;
+            
         } catch (Exception e) {
-            log.error("Ошибка при создании пользователя: {}", e.getMessage(), e);
-                        // В случае ошибки - откатываем изменения
+            log.error("Ошибка при создании пользователя: {}", e.getMessage());
+            
+            // Выполняем откат изменений в person-service если пользователь был создан
             if (createdUser != null) {
                 try {
+                    log.info("Выполняем откат изменений в person-service");
                     personServiceClient.deletePerson(createdUser.getId());
                 } catch (Exception rollbackEx) {
-                    log.error("Ошибка при откате изменений: {}", rollbackEx.getMessage(), rollbackEx);
+                    log.error("Ошибка при откате изменений: {}", rollbackEx.getMessage());
+                    // Добавляем rollbackEx к основной ошибке
+                    e.addSuppressed(rollbackEx);
                 }
             }
+            
             throw new RuntimeException("Ошибка при создании пользователя: " + e.getMessage(), e);
         }
     }

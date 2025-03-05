@@ -23,20 +23,20 @@ public class IndividualController {
             IndividualDto createdIndividual = individualService.createIndividual(individualDto);
             return ResponseEntity.ok(createdIndividual);
         } catch (Exception e) {
-            log.error("Ошибкапри создании пользователя: {}", e.getMessage(), e);
+            log.error("Ошибка при создании пользователя: {}", e.getMessage(), e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Ошибка при создании пользователя: " + e.getMessage());
         }
     }
 
-    @DeleteMapping
-    public ResponseEntity<?> deleteIndividual(@RequestBody IndividualDto individualDto) {
+    @DeleteMapping("/{id}")
+    public ResponseEntity<?> deleteIndividual(@PathVariable UUID id) {
         try {
-            individualService.deleteIndividual(individualDto);
+            individualService.deleteIndividualById(id);
             return ResponseEntity.ok().build();
         } catch (Exception e) {
-            log.error("Ошиб ка при удалении пользователя: {}", e.getMessage(), e);
+            log.error("Ошибка при удалении пользователя: {}", e.getMessage(), e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Ошибка при удалении пользователя: " + e.getMessage());
@@ -49,17 +49,20 @@ public class IndividualController {
             IndividualDto updatedIndividual = individualService.updateIndividual(individualDto);
             return ResponseEntity.ok(updatedIndividual);
         } catch (Exception e) {
-            log.error(" Ошибка при обновлении пользователя: {}", e.getMessage(), e);
+            log.error("Ошибка при обновлении пользователя: {}", e.getMessage(), e);
             return ResponseEntity
                     .status(HttpStatus.INTERNAL_SERVER_ERROR)
                     .body("Ошибка при обновлении пользователя: " + e.getMessage());
         }
     }
 
-    @GetMapping
-    public ResponseEntity<?> getIndividualByEmail(@RequestParam String email) {
+    @GetMapping("/by-email/{email}")
+    public ResponseEntity<?> getIndividualByEmail(@PathVariable String email) {
         try {
             IndividualDto individual = individualService.getIndividualByEmail(email);
+            if (individual == null) {
+                return ResponseEntity.notFound().build();
+            }
             return ResponseEntity.ok(individual);
         } catch (Exception e) {
             log.error("Ошибка при получении пользователя: {}", e.getMessage(), e);
@@ -68,38 +71,4 @@ public class IndividualController {
                     .body("Ошибка при получении пользователя: " + e.getMessage());
         }
     }
-
-
-
-    @DeleteMapping("/{email}")
-    public ResponseEntity<?> deleteIndividualByEmail(@PathVariable String email) {
-        try {
-                    //Сначала получаем пользователя по email
-            IndividualDto individual = individualService.getIndividualByEmail(email);
-            
-                //потом удаляем
-            individualService.deleteIndividual(individual);
-            
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            log.error("Ошибка при удалении пользователя по email {}: {}", email, e.getMessage(), e);
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Ошибка при удалении пользователя: " + e.getMessage());
-        }
-    }
-
-    @DeleteMapping("/{id}")
-    public ResponseEntity<?> deleteIndividualById(@PathVariable UUID id) {
-        try {
-            individualService.deleteIndividualById(id);
-            return ResponseEntity.ok().build();
-        } catch (Exception e) {
-            log.error("Ошибка при удалении пользователя по ID {}: {}", id, e.getMessage(), e);
-            return ResponseEntity
-                    .status(HttpStatus.INTERNAL_SERVER_ERROR)
-                    .body("Ошибка при удалении пользователя: " + e.getMessage());
-        }
-    }
-
 } 

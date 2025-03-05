@@ -49,9 +49,13 @@ public class PersonServiceClient {
     }
 
     public IndividualDto getPersonByEmail(String email) {
-        return restTemplate.getForObject(
-                personServiceUrl + "/api/v1/persons/email/" + email,
-                IndividualDto.class
-        );
+        try {
+            return restTemplate.getForObject(
+                    personServiceUrl + "/api/v1/persons/email/" + email,
+                    IndividualDto.class
+            );
+        } catch (HttpClientErrorException.NotFound e) {
+            return null;
+        }
     }
 }
